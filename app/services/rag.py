@@ -91,18 +91,11 @@ class RAGService:
             # Step 2: Vector similarity search
             search_results = await self.db.vector_search(query_embedding, top_k)
             
-            if not search_results:
-                return {
-                    'text': "I don't have enough information to answer your question. Could you please rephrase or provide more context?",
-                    'citations': [],
-                    'debug': {
-                        'top_doc_ids': [],
-                        'latency_ms': int((time.time() - start_time) * 1000)
-                    }
-                }
-            
-            # Step 3: Deduplicate and prepare context
-            context_blocks = self._prepare_context(search_results)
+            context_blocks = (
+                self._prepare_context(search_results)
+                if search_results
+                else []
+            )
             
             # Step 4: Generate answer
             answer_text = await self.chat_service.generate_answer(query, context_blocks)
