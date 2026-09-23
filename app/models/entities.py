@@ -1,6 +1,3 @@
-# Copyright 2024
-# Directory: yt-rag/app/models/entities.py
-
 """
 Database entity models for the RAG application.
 """
@@ -19,7 +16,6 @@ class RagChunk(BaseModel):
     embedding: Optional[List[float]] = Field(None, description="Vector embedding")
     created_at: Optional[datetime] = Field(None, description="Creation timestamp")
     
-    # Additional fields for search results
     similarity: Optional[float] = Field(None, description="Similarity score (0-1)")
     distance: Optional[float] = Field(None, description="Cosine distance")
 

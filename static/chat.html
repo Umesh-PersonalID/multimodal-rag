@@ -11,13 +11,13 @@
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg: #09090B;
-            --bg-secondary: #111827;
-            --card: #18181B;
-            --border: #27272A;
-            --accent: #7C3AED;
-            --accent-hover: #8B5CF6;
-            --accent-muted: rgba(124, 58, 237, 0.15);
+            --bg: #000000;
+            --bg-secondary: rgba(255, 255, 255, 0.04);
+            --card: rgba(24, 24, 27, 0.4);
+            --border: rgba(255, 255, 255, 0.08);
+            --accent: #6366F1;
+            --accent-hover: #818CF8;
+            --accent-muted: rgba(99, 102, 241, 0.14);
             --text: #FAFAFA;
             --text-secondary: #A1A1AA;
             --success: #22C55E;
@@ -26,14 +26,14 @@
             --radius-btn: 14px;
             --radius-input: 16px;
             --transition: 250ms ease;
-            --sidebar-width: 320px;
+            --sidebar-width: 300px;
             --header-height: 72px;
         }
 
         html, body {
             height: 100%;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
+            background: #000000;
             color: var(--text);
             -webkit-font-smoothing: antialiased;
         }
@@ -41,13 +41,39 @@
         button, input, textarea { font-family: inherit; }
 
         .app {
+            position: relative;
             display: flex;
             flex-direction: column;
             height: 100vh;
             overflow: hidden;
+            isolation: isolate;
         }
 
-        /* ── Header ── */
+        .app::before,
+        .app::after {
+            position: absolute;
+            z-index: -1;
+            width: 48vw;
+            height: 48vw;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.11;
+            pointer-events: none;
+            content: '';
+        }
+
+        .app::before {
+            top: -22vw;
+            left: -12vw;
+            background: #6366F1;
+        }
+
+        .app::after {
+            right: -14vw;
+            bottom: -26vw;
+            background: #A855F7;
+        }
+
         .header {
             height: var(--header-height);
             display: flex;
@@ -55,8 +81,9 @@
             justify-content: space-between;
             padding: 0 24px;
             border-bottom: 1px solid var(--border);
-            background: rgba(9, 9, 11, 0.85);
-            backdrop-filter: blur(12px);
+            background: rgba(0, 0, 0, 0.42);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             z-index: 50;
             flex-shrink: 0;
         }
@@ -137,7 +164,6 @@
             background: currentColor;
         }
 
-        /* ── Workspace ── */
         .workspace {
             display: flex;
             flex: 1;
@@ -145,15 +171,15 @@
             position: relative;
         }
 
-        /* ── Sidebar ── */
         .sidebar {
             width: var(--sidebar-width);
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
             border-right: 1px solid var(--border);
-            background: rgba(17, 24, 39, 0.6);
-            backdrop-filter: blur(16px);
+            background: rgba(24, 24, 27, 0.28);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             transition: transform var(--transition);
             z-index: 40;
         }
@@ -176,7 +202,6 @@
             margin-bottom: 12px;
         }
 
-        /* Upload zone */
         .upload-zone {
             position: relative;
             border-radius: var(--radius-card);
@@ -332,7 +357,6 @@
             animation: shimmer 1.5s infinite;
         }
 
-        /* Document cards */
         .doc-list { display: flex; flex-direction: column; gap: 10px; }
 
         .doc-card {
@@ -448,13 +472,12 @@
 
         .seed-btn:hover { border-color: var(--accent); color: var(--text); }
 
-        /* ── Chat area ── */
         .chat-area {
             flex: 1;
             display: flex;
             flex-direction: column;
             min-width: 0;
-            background: var(--bg);
+            background: rgba(0, 0, 0, 0.12);
         }
 
         .messages-wrap {
@@ -469,7 +492,6 @@
             padding: 32px 24px 16px;
         }
 
-        /* Welcome */
         .welcome-card {
             text-align: center;
             padding: 48px 24px;
@@ -528,7 +550,6 @@
             background: var(--accent-muted);
         }
 
-        /* Messages */
         .msg-row {
             display: flex;
             gap: 12px;
@@ -565,7 +586,7 @@
         .msg-row.user .msg-body { display: flex; flex-direction: column; align-items: flex-end; }
 
         .user-bubble {
-            background: linear-gradient(135deg, var(--accent), #9333EA);
+            background: var(--accent);
             color: white;
             padding: 14px 18px;
             border-radius: var(--radius-card);
@@ -578,10 +599,12 @@
         }
 
         .assistant-card {
-            background: var(--card);
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--border);
             border-radius: var(--radius-card);
             overflow: hidden;
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
         }
 
         .assistant-card-header {
@@ -602,7 +625,6 @@
             color: var(--text);
         }
 
-        /* Markdown */
         .md h1, .md h2, .md h3 { font-weight: 700; margin: 1em 0 0.5em; letter-spacing: -0.02em; }
         .md h1 { font-size: 1.4em; }
         .md h2 { font-size: 1.2em; }
@@ -649,7 +671,6 @@
             margin: 0.75em 0;
         }
 
-        /* Sources */
         .sources-block {
             border-top: 1px solid var(--border);
         }
@@ -700,7 +721,6 @@
         .source-item-name { font-weight: 500; color: var(--text); flex: 1; }
         .source-item-page { color: var(--text-secondary); }
 
-        /* Image results */
         .image-results {
             display: flex;
             flex-wrap: wrap;
@@ -758,7 +778,6 @@
             text-overflow: ellipsis;
         }
 
-        /* Thinking indicator */
         .thinking-row {
             display: none;
             gap: 12px;
@@ -802,21 +821,22 @@
         .thinking-dots span:nth-child(2) { animation-delay: 0.15s; }
         .thinking-dots span:nth-child(3) { animation-delay: 0.3s; }
 
-        /* ── Input area ── */
         .input-area {
             flex-shrink: 0;
             padding: 16px 24px 24px;
-            background: linear-gradient(to top, var(--bg) 70%, transparent);
+            background: linear-gradient(to top, #000000 70%, transparent);
         }
 
         .input-box {
             max-width: 820px;
             margin: 0 auto;
-            background: var(--card);
+            background: rgba(24, 24, 27, 0.4);
             border: 1px solid var(--border);
             border-radius: var(--radius-input);
             padding: 12px 14px;
             transition: border-color var(--transition), box-shadow var(--transition);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
 
         .input-box:focus-within {
@@ -877,7 +897,6 @@
         .send-btn:hover:not(:disabled) { background: var(--accent-hover); transform: scale(1.05); }
         .send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-        /* Toast */
         .toast {
             position: fixed;
             top: 88px;
@@ -899,7 +918,6 @@
         .toast.error { border-color: rgba(239, 68, 68, 0.4); color: var(--error); }
         .toast.info { border-color: rgba(124, 58, 237, 0.4); color: #C4B5FD; }
 
-        /* Lightbox */
         .lightbox {
             display: none;
             position: fixed;
@@ -947,7 +965,6 @@
 
         #fileInput { display: none; }
 
-        /* Animations */
         @keyframes fadeSlideUp {
             from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
@@ -968,7 +985,6 @@
             30% { transform: translateY(-5px); }
         }
 
-        /* Responsive */
         @media (max-width: 900px) {
             .sidebar-toggle { display: flex; align-items: center; justify-content: center; }
             .sidebar {
@@ -1094,10 +1110,6 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <script>
-    /* ═══════════════════════════════════════════════════════════
-       Multimodal RAG — Frontend Modules
-       ═══════════════════════════════════════════════════════════ */
-
     const Config = {
         API_BASE: window.location.origin,
         ACCEPTED_EXTENSIONS: ['.pdf', '.docx', '.png', '.jpg', '.jpeg', '.webp', '.gif', '.txt', '.md'],
@@ -1160,39 +1172,31 @@
             if (!text) return '';
             let html = Utils.escapeHtml(text);
 
-            // Code blocks
             html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) =>
                 `<pre><code class="language-${lang}">${code.trim()}</code></pre>`);
 
-            // Inline code
             html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-            // Headings
             html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
             html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
             html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
 
-            // Bold & italic
             html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
             html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
             html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
 
-            // Blockquote
             html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
 
-            // Unordered lists
             html = html.replace(/((?:^[-*] .+\n?)+)/gm, block => {
                 const items = block.trim().split('\n').map(l => `<li>${l.replace(/^[-*] /, '')}</li>`).join('');
                 return `<ul>${items}</ul>`;
             });
 
-            // Ordered lists
             html = html.replace(/((?:^\d+\. .+\n?)+)/gm, block => {
                 const items = block.trim().split('\n').map(l => `<li>${l.replace(/^\d+\. /, '')}</li>`).join('');
                 return `<ul>${items}</ul>`;
             });
 
-            // Tables
             html = html.replace(/((?:\|.+\|\n?)+)/g, block => {
                 const rows = block.trim().split('\n').filter(r => r.includes('|'));
                 if (rows.length < 2) return block;
@@ -1204,7 +1208,6 @@
                 return `<table><thead><tr>${header}</tr></thead><tbody>${body}</tbody></table>`;
             });
 
-            // Paragraphs
             html = html.split('\n\n').map(block => {
                 block = block.trim();
                 if (!block) return '';

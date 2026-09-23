@@ -1,7 +1,3 @@
-#!/usr/bin/env python3
-# Copyright 2024
-# Directory: yt-rag/test_setup.py
-
 """
 Test script to verify RAG backend setup is working correctly.
 Run this after completing the setup steps.
@@ -12,7 +8,6 @@ import sys
 import os
 from pathlib import Path
 
-# Add the app directory to Python path
 sys.path.insert(0, str(Path(__file__).parent))
 
 async def test_setup():
@@ -21,18 +16,15 @@ async def test_setup():
     print("=" * 50)
     
     try:
-        # Test 1: Import modules
         print("1️⃣  Testing imports...")
         from app.core.config import get_settings
         from app.core.database import db
         from app.services.rag import rag_service
         print("   ✅ All modules imported successfully")
         
-        # Test 2: Check configuration
         print("\n2️⃣  Testing configuration...")
         settings = get_settings()
         
-        # Check required environment variables
         required_vars = [
             'SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY',
             'OPENAI_API_KEY'
@@ -53,7 +45,6 @@ async def test_setup():
         print(f"   🤖 Using chat model: {settings.openai_chat_model}")
         print(f"   🔗 Using AI provider: {settings.ai_provider}")
         
-        # Test 3: Database connection
         print("\n3️⃣  Testing database connection...")
         await db.connect()
         health = await db.health_check()
@@ -65,12 +56,10 @@ async def test_setup():
         
         print("   ✅ Database connection successful")
         
-        # Test 4: Schema validation
         print("\n4️⃣  Testing database schema...")
         await db.initialize_schema()
         print("   ✅ Database schema validated")
         
-        # Test 5: Seeding documents
         print("\n5️⃣  Testing document seeding...")
         inserted_count = await rag_service.seed_documents()
         
@@ -79,7 +68,6 @@ async def test_setup():
         else:
             print(f"   ✅ Successfully seeded {inserted_count} document chunks")
         
-        # Test 6: RAG query
         print("\n6️⃣  Testing RAG query...")
         test_query = "Can I return shoes after 30 days?"
         result = await rag_service.answer_query(test_query)
@@ -94,7 +82,6 @@ async def test_setup():
         print(f"   📚 Citations: {result['citations']}")
         print(f"   ⏱️  Latency: {result['debug']['latency_ms']}ms")
         
-        # Cleanup
         await db.disconnect()
         
         print("\n🎉 ALL TESTS PASSED!")
@@ -121,7 +108,6 @@ async def main():
     print("🔧 RAG Backend Setup Verification")
     print("This will test your complete setup without starting the server.\n")
     
-    # Load environment variables
     from dotenv import load_dotenv
     load_dotenv()
     

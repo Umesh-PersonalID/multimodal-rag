@@ -1,6 +1,3 @@
-# Copyright 2024
-# Directory: yt-rag/app/models/responses.py
-
 """
 Response models for the RAG API endpoints.
 """

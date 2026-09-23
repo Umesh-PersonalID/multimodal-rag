@@ -1,6 +1,3 @@
-# Copyright 2024
-# Directory: yt-rag/app/main.py
-
 """
 FastAPI application for RAG (Retrieval-Augmented Generation) backend.
 Provides endpoints for document seeding and question answering with citations.
@@ -23,7 +20,6 @@ from .services.rag import rag_service
 from .services.multimodal import multimodal_ingestion_service
 from .data.default_documents import DEFAULT_DOCUMENTS
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -36,14 +32,11 @@ settings = get_settings()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan events."""
-    # Startup
     logger.info("Starting RAG API application")
     
     try:
-        # Initialize database connection
         await db.connect()
         
-        # Check database schema
         await db.initialize_schema()
         
         logger.info("Application startup completed successfully")
@@ -54,12 +47,10 @@ async def lifespan(app: FastAPI):
     
     yield
     
-    # Shutdown
     logger.info("Shutting down RAG API application")
     await db.disconnect()
 
 
-# Create FastAPI application
 app = FastAPI(
     title="RAG AI Agent Backend",
     description="A minimal, production-ready FastAPI backend demonstrating Retrieval-Augmented Generation (RAG) with vector similarity search.",
@@ -67,21 +58,19 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Configure CORS for frontend integration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",  # NextJS default
-        "http://localhost:3001",  # Alternative port
-        "https://yt-rag.vercel.app",  # Production frontend
-        "*"  # Allow all for development (remove in production)
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "https://yt-rag.vercel.app",
+        "*"
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Mount static files for the chat interface
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
@@ -94,7 +83,7 @@ async def chat_interface():
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     """Handle favicon requests to prevent 404 errors."""
-    return Response(status_code=204)  # No Content
+    return Response(status_code=204)
 
 
 @app.get("/", tags=["General"])
@@ -133,7 +122,6 @@ async def greet(name: str):
 async def health_check():
     """Health check endpoint with database connectivity test."""
     try:
-        # Test database connection
         db_healthy = await db.health_check()
         
         return HealthResponse(
@@ -186,7 +174,6 @@ async def seed_documents(request: SeedRequest = SeedRequest()):
     try:
         logger.info("Starting document seeding process")
         
-        # Convert request documents to the format expected by RAG service
         documents = None
         if request.docs:
             documents = [
@@ -198,7 +185,6 @@ async def seed_documents(request: SeedRequest = SeedRequest()):
                 for doc in request.docs
             ]
         
-        # Process documents through RAG pipeline
         inserted_count = await rag_service.seed_documents(documents)
         
         logger.info(f"Seeding completed: {inserted_count} chunks inserted")
@@ -227,13 +213,11 @@ async def answer_question(request: AnswerRequest):
     try:
         logger.info(f"Processing query: '{request.query[:100]}...'")
         
-        # Process query through RAG pipeline
         result = await rag_service.answer_query(
             query=request.query,
             top_k=request.top_k
         )
         
-        # Convert to response model
         response = AnswerResponse(
             text=result['text'],
             citations=result['citations'],
@@ -257,7 +241,6 @@ async def answer_question(request: AnswerRequest):
         )
 
 
-# Error handlers
 @app.exception_handler(404)
 async def not_found_handler(request, exc):
     """Handle 404 errors."""

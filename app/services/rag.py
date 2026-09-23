@@ -1,6 +1,3 @@
-# Copyright 2024
-# Directory: yt-rag/app/services/rag.py
-
 """
 RAG (Retrieval-Augmented Generation) service implementation.
 Orchestrates the complete RAG pipeline: chunk → embed → search → generate.
@@ -41,25 +38,20 @@ class RAGService:
         """
         start_time = time.time()
         
-        # Use default documents if none provided
         if documents is None:
             documents = DEFAULT_DOCUMENTS
             logger.info("Using default documents for seeding")
         
         try:
-            # Step 1: Chunk documents
             chunks = self.chunker.chunk_documents(documents)
             logger.info(f"Created {len(chunks)} chunks from {len(documents)} documents")
             
-            # Step 2: Generate embeddings for all chunks
             texts = [chunk['text'] for chunk in chunks]
             embeddings = await self.embedding_service.embed_texts(texts)
             
-            # Step 3: Combine chunks with embeddings
             for chunk, embedding in zip(chunks, embeddings):
                 chunk['embedding'] = embedding
             
-            # Step 4: Store in database
             inserted_count = await self.db.upsert_chunks(chunks)
             
             elapsed_ms = int((time.time() - start_time) * 1000)
@@ -85,10 +77,8 @@ class RAGService:
         start_time = time.time()
         
         try:
-            # Step 1: Generate query embedding
             query_embedding = await self.embedding_service.embed_query(query)
             
-            # Step 2: Vector similarity search
             search_results = await self.db.vector_search(query_embedding, top_k)
             
             context_blocks = (
@@ -97,10 +87,8 @@ class RAGService:
                 else []
             )
             
-            # Step 4: Generate answer
             answer_text = await self.chat_service.generate_answer(query, context_blocks)
             
-            # Step 5: Extract citations from answer
             citations = self._extract_citations(answer_text, context_blocks)
             
             elapsed_ms = int((time.time() - start_time) * 1000)
@@ -160,7 +148,6 @@ class RAGService:
         Returns:
             Processed context blocks
         """
-        # Simple deduplication by exact chunk_id so multimodal chunks stay visible.
         seen_chunk_ids = set()
         context_blocks = []
         
@@ -171,7 +158,6 @@ class RAGService:
                 context_blocks.append(result)
                 seen_chunk_ids.add(chunk_id)
             
-            # Limit to reasonable context size
             if len(context_blocks) >= 6:
                 break
         
@@ -189,15 +175,12 @@ class RAGService:
         Returns:
             List of chunk_ids that were cited
         """
-        # Find all citations in format [chunk_id]
         citation_pattern = r'\[([^\]]+)\]'
         found_citations = re.findall(citation_pattern, answer_text)
         
-        # Filter to only include valid chunk_ids from context
         valid_chunk_ids = {block['chunk_id'] for block in context_blocks}
         valid_citations = [cite for cite in found_citations if cite in valid_chunk_ids]
         
-        # Remove duplicates while preserving order
         unique_citations = []
         for cite in valid_citations:
             if cite not in unique_citations:
@@ -206,5 +189,4 @@ class RAGService:
         return unique_citations
 
 
-# Global RAG service instance
 rag_service = RAGService()

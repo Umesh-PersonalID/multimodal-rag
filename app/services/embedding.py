@@ -1,6 +1,3 @@
-# Copyright 2024
-# Directory: yt-rag/app/services/embedding.py
-
 """
 Embedding service for generating text embeddings using OpenAI.
 Focused solely on vector embeddings for RAG retrieval.
@@ -61,5 +58,4 @@ class EmbeddingService:
         return embeddings[0]
 
 
-# Global service instance
 embedding_service = EmbeddingService()

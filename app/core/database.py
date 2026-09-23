@@ -1,6 +1,3 @@
-# Copyright 2024
-# Directory: yt-rag/app/core/database.py
-
 """
 Database connection and schema management using Supabase SDK.
 Handles Supabase Postgres with pgvector extension for RAG operations.
@@ -26,13 +23,11 @@ class Database:
     async def connect(self) -> None:
         """Initialize Supabase clients."""
         try:
-            # Regular client with anon key (for future frontend compatibility)
             self.supabase = create_client(
                 settings.supabase_url,
                 settings.supabase_anon_key
             )
             
-            # Admin client with service role key (for backend operations)
             self._admin_client = create_client(
                 settings.supabase_url,
                 settings.supabase_service_role_key
@@ -45,7 +40,6 @@ class Database:
     
     async def disconnect(self) -> None:
         """Close Supabase connections (cleanup if needed)."""
-        # Supabase clients don't need explicit disconnection
         logger.info("Supabase clients cleaned up")
     
     def get_client(self, admin: bool = True) -> Client:
@@ -71,13 +65,11 @@ class Database:
         try:
             client = self.get_client(admin=True)
             
-            # Check if the table exists and has the required structure
             result = client.table('rag_chunks').select('id').limit(1).execute()
             
             if result.data is not None:
                 logger.info("Database schema is properly initialized")
                 
-                # Test the vector search function
                 try:
                     stats_result = client.rpc('get_chunk_stats').execute()
                     if stats_result.data:
@@ -118,7 +110,6 @@ class Database:
         try:
             client = self.get_client(admin=True)
             
-            # Prepare data for Supabase
             chunk_data = []
             for chunk in chunks:
                 chunk_data.append({
@@ -134,10 +125,9 @@ class Database:
                     'width': chunk.get('width'),
                     'height': chunk.get('height'),
                     'metadata': chunk.get('metadata', {}),
-                    'embedding': chunk['embedding']  # Supabase handles vector serialization
+                    'embedding': chunk['embedding']
                 })
             
-            # Use upsert with on_conflict parameter
             result = client.table('rag_chunks').upsert(
                 chunk_data,
                 on_conflict='chunk_id'
@@ -165,8 +155,6 @@ class Database:
         try:
             client = self.get_client(admin=True)
             
-            # Use RPC call for vector similarity search
-            # This requires creating a PostgreSQL function in Supabase
             result = client.rpc('match_chunks', {
                 'query_embedding': query_embedding,
                 'match_count': top_k
@@ -176,15 +164,12 @@ class Database:
                 logger.info(f"Vector search returned {len(result.data)} results")
                 return result.data
             else:
-                # Fallback: if RPC function doesn't exist, use regular query
-                # This won't have vector similarity but will work for basic testing
                 logger.info("Using fallback query (match_chunks RPC function not available)")
                 result = client.table('rag_chunks').select('*').limit(top_k).execute()
                 
-                # Add mock similarity scores for fallback
                 if result.data:
                     for i, chunk in enumerate(result.data):
-                        chunk['similarity'] = 1.0 - (i * 0.1)  # Mock decreasing similarity
+                        chunk['similarity'] = 1.0 - (i * 0.1)
                 
                 return result.data or []
                 
@@ -197,15 +182,13 @@ class Database:
         try:
             client = self.get_client(admin=True)
             
-            # Simple query to test connection
             result = client.table('rag_chunks').select('id').limit(1).execute()
             
-            return True  # If no exception, connection is healthy
+            return True
             
         except Exception as e:
             logger.error(f"Database health check failed: {e}")
             return False
 
 
-# Global database instance
 db = Database()

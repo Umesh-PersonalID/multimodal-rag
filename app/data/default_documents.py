@@ -1,6 +1,3 @@
-# Copyright 2024
-# Directory: yt-rag/app/data/default_documents.py
-
 """
 Default documents for seeding the RAG knowledge base.
 Contains sample policy and support information for demonstration.
@@ -8,7 +5,6 @@ Contains sample policy and support information for demonstration.
 
 from typing import List, Dict
 
-# Default documents for seeding
 DEFAULT_DOCUMENTS: List[Dict[str, str]] = [
     {
         'chunk_id': 'policy_returns_v1',

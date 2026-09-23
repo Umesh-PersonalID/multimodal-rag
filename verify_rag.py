@@ -1,7 +1,3 @@
-#!/usr/bin/env python3
-# Copyright 2024
-# Directory: yt-rag/verify_rag.py
-
 """
 Script to prove we're doing real RAG with vector similarity search.
 This will show actual embeddings, similarity scores, and vector operations.
@@ -14,7 +10,6 @@ from dotenv import load_dotenv
 from supabase import create_client
 from app.services.embedding import embedding_service
 
-# Load environment variables
 load_dotenv()
 
 async def prove_real_rag():
@@ -23,7 +18,6 @@ async def prove_real_rag():
     print("🔍 PROVING REAL RAG IMPLEMENTATION")
     print("=" * 60)
     
-    # Initialize Supabase client
     supabase_url = os.getenv("SUPABASE_URL")
     supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
     
@@ -33,7 +27,6 @@ async def prove_real_rag():
     
     supabase = create_client(supabase_url, supabase_key)
     
-    # Step 1: Show actual embeddings exist in database
     print("\n1️⃣ CHECKING ACTUAL EMBEDDINGS IN DATABASE")
     print("-" * 40)
     
@@ -57,28 +50,25 @@ async def prove_real_rag():
         print(f"❌ Database error: {e}")
         return
     
-    # Step 2: Test different queries with vector similarity
     print("2️⃣ TESTING VECTOR SIMILARITY WITH DIFFERENT QUERIES")
     print("-" * 50)
     
     test_queries = [
-        "Can I return shoes?",                    # Should match return policy
-        "How much is shipping?",                  # Should match shipping policy  
-        "What size should I order?",              # Should match sizing guide
-        "How do I contact support?",              # Should match customer support
-        "What's the weather like?",               # Should find no good matches
+        "Can I return shoes?",
+        "How much is shipping?",
+        "What size should I order?",
+        "How do I contact support?",
+        "What's the weather like?",
     ]
     
     for query in test_queries:
         print(f"\n🔍 Query: '{query}'")
         
         try:
-            # Generate query embedding
             query_embedding = await embedding_service.embed_query(query)
             print(f"📐 Query embedding dimensions: {len(query_embedding)}")
             print(f"🎯 Query vector preview: {query_embedding[:5]}...")
             
-            # Perform vector search using Supabase's match_chunks function
             search_result = supabase.rpc('match_chunks', {
                 'query_embedding': query_embedding,
                 'match_threshold': 0.1,
@@ -88,7 +78,7 @@ async def prove_real_rag():
             if search_result.data:
                 print(f"✅ Found {len(search_result.data)} similar chunks:")
                 for i, match in enumerate(search_result.data[:3]):
-                    similarity = 1 - match.get('similarity', 0)  # Convert distance to similarity
+                    similarity = 1 - match.get('similarity', 0)
                     print(f"   {i+1}. {match['chunk_id']} (similarity: {similarity:.4f})")
                     print(f"      Preview: {match['text'][:80]}...")
             else:
@@ -97,21 +87,18 @@ async def prove_real_rag():
         except Exception as e:
             print(f"❌ Error processing query: {e}")
     
-    # Step 3: Compare embeddings to show they're actually different
     print("\n3️⃣ PROVING EMBEDDINGS ARE ACTUALLY DIFFERENT")
     print("-" * 45)
     
     try:
-        # Get embeddings for different texts
         text1 = "return policy shoes"
         text2 = "shipping cost fast delivery" 
-        text3 = "return policy shoes"  # Same as text1
+        text3 = "return policy shoes"
         
         emb1 = await embedding_service.embed_query(text1)
         emb2 = await embedding_service.embed_query(text2)
         emb3 = await embedding_service.embed_query(text3)
         
-        # Calculate cosine similarity
         def cosine_similarity(a, b):
             dot_product = sum(x*y for x, y in zip(a, b))
             magnitude_a = sum(x*x for x in a)**0.5
@@ -135,7 +122,6 @@ async def prove_real_rag():
     except Exception as e:
         print(f"❌ Error comparing embeddings: {e}")
     
-    # Step 4: Show the actual RAG pipeline in action
     print("\n4️⃣ TRACING THE FULL RAG PIPELINE")
     print("-" * 35)
     
@@ -145,7 +131,6 @@ async def prove_real_rag():
     try:
         from app.services.rag import rag_service
         
-        # This will show the full pipeline
         result = await rag_service.answer_query(test_query, top_k=3)
         
         print(f"🤖 Generated answer: {result['text'][:200]}...")

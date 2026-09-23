@@ -1,7 +1,3 @@
-#!/usr/bin/env python3
-# Copyright 2024
-# Directory: yt-rag/check_dimensions.py
-
 """
 Quick script to check embedding dimensions in the database.
 """
@@ -10,13 +6,11 @@ import os
 from dotenv import load_dotenv
 from supabase import create_client
 
-# Load environment variables
 load_dotenv()
 
 def check_embedding_dimensions():
     """Check the dimensions of embeddings in the database."""
     
-    # Initialize Supabase client
     supabase_url = os.getenv("SUPABASE_URL")
     supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
     
@@ -27,12 +21,10 @@ def check_embedding_dimensions():
     supabase = create_client(supabase_url, supabase_key)
     
     try:
-        # Method 1: Check using raw SQL
         print("🔍 Checking embedding dimensions...")
         
-        # Get one row to check dimensions
         result = supabase.rpc('match_chunks', {
-            'query_embedding': '[0]' * 1536,  # Dummy vector
+            'query_embedding': '[0]' * 1536,
             'match_threshold': 0.1,
             'match_count': 1
         }).execute()
@@ -43,7 +35,6 @@ def check_embedding_dimensions():
             print("⚠️  No chunks found in database. Run /seed first.")
             return
         
-        # Method 2: Direct table query to check schema
         schema_result = supabase.table('rag_chunks').select('*').limit(1).execute()
         
         if schema_result.data:
@@ -56,7 +47,6 @@ def check_embedding_dimensions():
             else:
                 print("❌ No embedding data found")
         
-        # Method 3: Check table schema info
         print("\n📋 Table Schema Info:")
         print("Run this SQL in Supabase SQL Editor:")
         print("SELECT column_name, data_type FROM information_schema.columns")

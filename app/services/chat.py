@@ -1,6 +1,3 @@
-# Copyright 2024
-# Directory: yt-rag/app/services/chat.py
-
 """
 Chat completion service for generating RAG responses.
 Supports both OpenAI and Anthropic with configurable models.
@@ -48,7 +45,6 @@ class ChatService:
         Returns:
             Generated answer with citations
         """
-        # Build context string with citations and collect image payloads for vision models.
         context_parts = []
         image_payloads = []
         for block in context_blocks:
@@ -178,5 +174,4 @@ Answer using the context above. If an attached image is useful, reason over it d
         }
 
 
-# Global service instance
 chat_service = ChatService()

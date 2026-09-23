@@ -1,6 +1,3 @@
-# Copyright 2024
-# Directory: yt-rag/app/services/chunker.py
-
 """
 Text chunking utilities for RAG document processing.
 Implements simple word-based chunking with overlap for optimal retrieval.
@@ -29,7 +26,6 @@ class TextChunker:
         self.chunk_size = chunk_size or settings.chunk_size
         self.overlap = overlap or settings.chunk_overlap
         
-        # Rough approximation: 1 token ≈ 0.75 words
         self.words_per_chunk = int(self.chunk_size * 0.75)
         self.overlap_words = int(self.overlap * 0.75)
         
@@ -50,12 +46,10 @@ class TextChunker:
         if not text or not text.strip():
             return []
         
-        # Clean and normalize text
         cleaned_text = self._clean_text(text)
         words = cleaned_text.split()
         
         if len(words) <= self.words_per_chunk:
-            # Text is small enough to be a single chunk
             return [{
                 'chunk_id': f"{base_chunk_id}#1",
                 'source': source,
@@ -67,14 +61,11 @@ class TextChunker:
         chunk_num = 1
         
         while start_idx < len(words):
-            # Calculate end index for this chunk
             end_idx = min(start_idx + self.words_per_chunk, len(words))
             
-            # Extract chunk words
             chunk_words = words[start_idx:end_idx]
             chunk_text = ' '.join(chunk_words)
             
-            # Create chunk dictionary
             chunk = {
                 'chunk_id': f"{base_chunk_id}#{chunk_num}",
                 'source': source,
@@ -82,9 +73,8 @@ class TextChunker:
             }
             chunks.append(chunk)
             
-            # Move start index for next chunk (with overlap)
             if end_idx >= len(words):
-                break  # We've processed all words
+                break
             
             start_idx = end_idx - self.overlap_words
             chunk_num += 1
@@ -102,13 +92,10 @@ class TextChunker:
         Returns:
             Cleaned text
         """
-        # Remove excessive whitespace
         text = re.sub(r'\s+', ' ', text)
         
-        # Remove leading/trailing whitespace
         text = text.strip()
         
-        # Normalize quotes
         text = text.replace('“', '"').replace('”', '"')
         text = text.replace('‘', "'").replace('’', "'")
         
@@ -163,5 +150,4 @@ class TextChunker:
 
 
 
-# Global chunker instance
 chunker = TextChunker()

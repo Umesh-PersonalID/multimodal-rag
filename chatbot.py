@@ -1,7 +1,3 @@
-#!/usr/bin/env python3
-# Copyright 2024
-# Directory: yt-rag/chatbot.py
-
 """
 Beautiful terminal-based chatbot to interact with the RAG backend API.
 Enhanced with rich styling, colors, and modern UI elements.
@@ -15,7 +11,6 @@ import os
 from datetime import datetime
 from typing import Dict, Any
 
-# Rich library for beautiful terminal output
 try:
     from rich.console import Console
     from rich.panel import Panel
@@ -119,7 +114,6 @@ class RAGChatbot:
             self._print_welcome_fallback()
             return
             
-        # Create animated title
         title = Text()
         title.append("🤖 ", style="bold blue")
         title.append("RAG AI Assistant", style="bold magenta")
@@ -140,7 +134,6 @@ class RAGChatbot:
         
         self.console.print(welcome_panel)
         
-        # Commands table
         commands_table = Table(
             title="Available Commands",
             box=box.ROUNDED,
@@ -269,7 +262,6 @@ class RAGChatbot:
             return
         
         if "text" in response:
-            # Main response
             response_text = Text()
             response_text.append("🤖 ", style="bold blue")
             response_text.append(response['text'], style="white")
@@ -283,7 +275,6 @@ class RAGChatbot:
             )
             self.console.print(response_panel)
             
-            # Citations and metadata
             if "citations" in response and response["citations"]:
                 citations_text = Text()
                 citations_text.append("📚 Sources: ", style="bold green")
@@ -326,11 +317,10 @@ class RAGChatbot:
             transient=True,
         ) as progress:
             task = progress.add_task("🤔 Thinking...", total=None)
-            time.sleep(0.5)  # Brief animation
+            time.sleep(0.5)
     
     def run(self):
         """Run the interactive chatbot."""
-        # Clear screen for better presentation
         if RICH_AVAILABLE:
             self.console.clear()
         else:
@@ -338,7 +328,6 @@ class RAGChatbot:
             
         self.print_welcome()
         
-        # Check health on startup
         if not self.check_health():
             if RICH_AVAILABLE:
                 warning = Panel(
@@ -374,7 +363,6 @@ class RAGChatbot:
                 if not user_input:
                     continue
                 
-                # Handle commands
                 if user_input.lower() == "/quit":
                     if RICH_AVAILABLE:
                         goodbye = Panel(
@@ -451,7 +439,6 @@ class RAGChatbot:
                         os.system('clear' if os.name == 'posix' else 'cls')
                     continue
                 
-                # Regular question
                 self.show_thinking_animation()
                 response = self.ask_question(user_input)
                 self.conversation_count += 1
@@ -484,7 +471,6 @@ class RAGChatbot:
 
 
 if __name__ == "__main__":
-    # Allow custom base URL via command line argument
     base_url = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8000"
     
     chatbot = RAGChatbot(base_url)

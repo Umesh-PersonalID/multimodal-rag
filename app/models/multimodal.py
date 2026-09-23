@@ -1,6 +1,3 @@
-# Copyright 2024
-# Directory: yt-rag/app/models/multimodal.py
-
 """
 Multimodal ingestion and retrieval models.
 """
