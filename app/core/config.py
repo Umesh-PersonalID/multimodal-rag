@@ -16,14 +16,18 @@ class Settings(BaseSettings):
     supabase_anon_key: str = Field(..., env="SUPABASE_ANON_KEY")
     supabase_service_role_key: str = Field(..., env="SUPABASE_SERVICE_ROLE_KEY")
     
-    ai_provider: Literal["openai", "anthropic"] = Field(default="openai", env="AI_PROVIDER")
+    ai_provider: Literal["openai", "anthropic", "gemini"] = Field(default="gemini", env="AI_PROVIDER")
     
-    openai_api_key: str = Field(..., env="OPENAI_API_KEY")
+    openai_api_key: str = Field(default="", env="OPENAI_API_KEY")
     openai_embed_model: str = Field(default="text-embedding-3-small", env="OPENAI_EMBED_MODEL")
     openai_chat_model: str = Field(default="gpt-4o", env="OPENAI_CHAT_MODEL")
     
     anthropic_api_key: str = Field(default="", env="ANTHROPIC_API_KEY")
     anthropic_chat_model: str = Field(default="claude-3-5-sonnet-20241022", env="ANTHROPIC_CHAT_MODEL")
+    
+    gemini_api_key: str = Field(default="", env="GEMINI_API_KEY")
+    gemini_embed_model: str = Field(default="models/gemini-embedding-2", env="GEMINI_EMBED_MODEL")
+    gemini_chat_model: str = Field(default="models/gemini-3.5-flash", env="GEMINI_CHAT_MODEL")
     
     environment: str = Field(default="development", env="ENVIRONMENT")
     log_level: str = Field(default="INFO", env="LOG_LEVEL")
@@ -32,7 +36,7 @@ class Settings(BaseSettings):
     chunk_size: int = Field(default=400)
     chunk_overlap: int = Field(default=60)
     temperature: float = Field(default=0.1)
-    embedding_dimensions: int = Field(default=1536)
+    embedding_dimensions: int = Field(default=768)
 
     storage_root: str = Field(default="storage", env="STORAGE_ROOT")
     uploaded_docs_dir: str = Field(default="storage/uploaded_docs", env="UPLOADED_DOCS_DIR")

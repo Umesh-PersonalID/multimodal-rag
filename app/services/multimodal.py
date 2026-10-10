@@ -66,7 +66,11 @@ class VisionCaptionService:
         self.settings = get_settings()
         self.provider = self.settings.ai_provider
 
-        if self.provider == "openai":
+        if self.provider == "gemini":
+            from google import genai
+            self.client = genai.Client(api_key=self.settings.gemini_api_key)
+            self.model = self.settings.gemini_chat_model
+        elif self.provider == "openai":
             import openai
 
             self.client = openai.OpenAI(api_key=self.settings.openai_api_key)
@@ -106,7 +110,26 @@ class VisionCaptionService:
             prompt += f" OCR text extracted from the image: {ocr_text[:500]}"
 
         try:
-            if self.provider == "openai":
+            if self.provider == "gemini":
+                from google.genai import types
+                
+                config = types.GenerateContentConfig(
+                    system_instruction="You caption document images for multimodal retrieval.",
+                    temperature=0,
+                    max_output_tokens=200,
+                )
+                response = self.client.models.generate_content(
+                    model=self.model,
+                    contents=[
+                        prompt + page_suffix + image_suffix,
+                        types.Part.from_bytes(data=image_bytes, mime_type=mime_type)
+                    ],
+                    config=config
+                )
+                caption = response.text or ""
+                return caption.strip() or self._fallback_caption(filename, page_number, image_index, ocr_text)
+
+            elif self.provider == "openai":
                 response = self.client.chat.completions.create(
                     model=self.model,
                     messages=[

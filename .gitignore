@@ -3,3 +3,6 @@ repomix-output.xml
 .vscode/
 __pycache__/
 storage/
+
+.venv
+.venv/

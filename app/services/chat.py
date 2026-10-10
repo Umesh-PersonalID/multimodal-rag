@@ -23,7 +23,11 @@ class ChatService:
         """Initialize chat clients based on configuration."""
         self.provider = settings.ai_provider
         
-        if self.provider == "openai":
+        if self.provider == "gemini":
+            from google import genai
+            self.client = genai.Client(api_key=settings.gemini_api_key)
+            self.model = settings.gemini_chat_model
+        elif self.provider == "openai":
             self.client = openai.OpenAI(api_key=settings.openai_api_key)
             self.model = settings.openai_chat_model
         elif self.provider == "anthropic":
@@ -92,7 +96,37 @@ Question: {query}
 Answer using the context above. If an attached image is useful, reason over it directly and cite the corresponding chunk ID."""
 
         try:
-            if self.provider == "openai":
+            if self.provider == "gemini":
+                from google import genai
+                from google.genai import types
+                
+                contents = [user_prompt]
+                for image_payload in image_payloads[:2]:
+                    contents.append(
+                        f"Attached image for [{image_payload['chunk_id']}]"
+                        + (f" on page {image_payload['page_number']}" if image_payload.get('page_number') is not None else "")
+                        + (f". Caption: {image_payload['caption']}" if image_payload.get('caption') else "")
+                    )
+                    contents.append(
+                        types.Part.from_bytes(
+                            data=base64.b64decode(image_payload['b64']),
+                            mime_type=image_payload['mime_type']
+                        )
+                    )
+                    
+                config = types.GenerateContentConfig(
+                    system_instruction=system_prompt,
+                    temperature=settings.temperature,
+                    max_output_tokens=1000,
+                )
+                response = self.client.models.generate_content(
+                    model=self.model,
+                    contents=contents,
+                    config=config
+                )
+                answer = response.text
+
+            elif self.provider == "openai":
                 user_content = [{"type": "text", "text": user_prompt}]
                 for image_payload in image_payloads[:2]:
                     user_content.append({

@@ -26,9 +26,12 @@ async def test_setup():
         settings = get_settings()
         
         required_vars = [
-            'SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY',
-            'OPENAI_API_KEY'
+            'SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY'
         ]
+        if settings.ai_provider == "gemini":
+            required_vars.append('GEMINI_API_KEY')
+        elif settings.ai_provider == "openai":
+            required_vars.append('OPENAI_API_KEY')
         
         missing_vars = []
         for var in required_vars:
@@ -41,8 +44,14 @@ async def test_setup():
             return False
         
         print("   ✅ Environment variables configured")
-        print(f"   📊 Using embedding model: {settings.openai_embed_model}")
-        print(f"   🤖 Using chat model: {settings.openai_chat_model}")
+        
+        if settings.ai_provider == "gemini":
+            print(f"   📊 Using embedding model: {settings.gemini_embed_model}")
+            print(f"   🤖 Using chat model: {settings.gemini_chat_model}")
+        else:
+            print(f"   📊 Using embedding model: {settings.openai_embed_model}")
+            print(f"   🤖 Using chat model: {settings.openai_chat_model}")
+            
         print(f"   🔗 Using AI provider: {settings.ai_provider}")
         
         print("\n3️⃣  Testing database connection...")
