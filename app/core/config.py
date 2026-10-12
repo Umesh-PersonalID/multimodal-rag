@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     
     gemini_api_key: str = Field(default="", env="GEMINI_API_KEY")
     gemini_embed_model: str = Field(default="models/gemini-embedding-2", env="GEMINI_EMBED_MODEL")
-    gemini_chat_model: str = Field(default="models/gemini-3.5-flash", env="GEMINI_CHAT_MODEL")
+    gemini_chat_model: str = Field(default="models/gemini-3.5-flash-lite", env="GEMINI_CHAT_MODEL")
     
     environment: str = Field(default="development", env="ENVIRONMENT")
     log_level: str = Field(default="INFO", env="LOG_LEVEL")

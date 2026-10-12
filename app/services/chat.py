@@ -3,6 +3,7 @@ Chat completion service for generating RAG responses.
 Supports both OpenAI and Anthropic with configurable models.
 """
 
+import asyncio
 import base64
 import logging
 import mimetypes
@@ -119,12 +120,44 @@ Answer using the context above. If an attached image is useful, reason over it d
                     temperature=settings.temperature,
                     max_output_tokens=1000,
                 )
-                response = self.client.models.generate_content(
-                    model=self.model,
-                    contents=contents,
-                    config=config
-                )
-                answer = response.text
+                fallback_models = [self.model]
+                for candidate in ["models/gemini-3.5-flash-lite", "models/gemini-flash-lite-latest", "models/gemini-3.5-flash"]:
+                    if candidate not in fallback_models:
+                        fallback_models.append(candidate)
+
+                answer = None
+                last_error = None
+                for current_model in fallback_models:
+                    for attempt in range(3):
+                        try:
+                            response = self.client.models.generate_content(
+                                model=current_model,
+                                contents=contents,
+                                config=config
+                            )
+                            answer = response.text
+                            if answer:
+                                break
+                        except Exception as err:
+                            last_error = err
+                            err_str = str(err).lower()
+                            if any(code in err_str for code in ["503", "unavailable", "429", "resource_exhausted", "high demand"]):
+                                logger.warning(
+                                    f"Gemini {current_model} temporary error on attempt {attempt + 1}: {err}. Retrying..."
+                                )
+                                if attempt < 2:
+                                    await asyncio.sleep(1.0 * (attempt + 1))
+                                    continue
+                                else:
+                                    logger.warning(f"Exceeded retries for {current_model}, falling back to next model...")
+                                    break
+                            else:
+                                raise err
+                    if answer:
+                        break
+
+                if not answer and last_error:
+                    raise last_error
 
             elif self.provider == "openai":
                 user_content = [{"type": "text", "text": user_prompt}]
